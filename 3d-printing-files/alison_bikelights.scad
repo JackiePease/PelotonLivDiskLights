@@ -1,6 +1,6 @@
 frameThickness=1;
 centreCircleDiameter=15;
-fn=40;
+fn=8;
 ledsInRing=[1, 8, 12, 16, 24, 32];
 ringRadius=[7.5, 10, 10, 10, 10, 27];
 ringAmplitude=[7, 7, 7, 7, 7, 17];
@@ -12,10 +12,10 @@ plateRadius=100;
 slope=0.9;
 boltDiameter=3;
 numBolts=8;
-
+brimDepth=1.5;
 difference(){
     union(){
-        color("red")
+        rotate([0,0,180/ledsInRing[noRings - 1]])
         translate([0,0,(height-frameThickness)/2])
         minkowski(){
              linear_extrude(height = height-frameThickness, center = true, $fn = fn, scale = slope){
@@ -23,24 +23,30 @@ difference(){
              }
              sphere(r=frameThickness, $fn=fn);
          } 
-         linear_extrude(height = diskIndent, center = false, $fn = fn){
+         linear_extrude(height = brimDepth, center = false, $fn = fn){
              difference(){
              circle(r = sum(ringRadius, noRings-1) + frameThickness/2);
                  // bolt holes
                  for (k = [0:1:numBolts-1]){
-                     rotate([0,0,(k*360/numBolts) - 360/numBolts])
-                     translate([sum(ringRadius, noRings-1) - boltDiameter,0,0])
+                     rotate([0,0,(k*360/numBolts) + 180/ledsInRing[noRings-1]])
+                     translate([sum(ringRadius, noRings-1) - 3*boltDiameter/2,0,0])
                      circle(r=boltDiameter/2);
                  }
              }
          } 
-     }
-     color("blue")  
-     linear_extrude(height = height-frameThickness, center = false, $fn = fn, scale = slope){
-        for (j = [0:1:noRings-1]){
-            makeRing(j);
-         }
-     }        
+     } 
+     intersection(){
+       rotate([0,0,180/ledsInRing[noRings-1]])
+       translate([0,0,(height-frameThickness)/2])
+       linear_extrude(height = height-frameThickness, center = true, $fn = fn, scale = slope){
+             bumpy_loop(sum(ringRadius, noRings-1)-frameThickness/2, ledsInRing[noRings-1], ringAmplitude[noRings-1]);
+        }   
+        linear_extrude(height = height-frameThickness, center = false, $fn = fn, scale = 1){
+            for (j = [0:1:noRings-1]){
+                makeRing(j);
+             }
+        } 
+     }    
      cylinder(h=diskIndent*2, r=diskRadius, $fn=fn, center=true);
      translate([0, 0, -sum(ringRadius, noRings-1)])
      cube([sum(ringRadius, noRings-1)*3,sum(ringRadius, noRings-1)*3,sum(ringRadius, noRings-1)*2],true);
@@ -53,13 +59,16 @@ if (j == 0){
     circle(r=ringRadius[j] - frameThickness/2, $fn=fn);
     }
 
-else {difference(){ 
+else 
+    {difference(){ 
             radiusOuter = sum(ringRadius, j);
             offset(-frameThickness/2)
+              rotate([0,0,180/ledsInRing[j]])
               bumpy_loop(radiusOuter, ledsInRing[j], ringAmplitude[j]);
             if (j > 1){
               radiusOuter1 = sum(ringRadius, j-1);
               offset(frameThickness/2)
+                rotate([0,0,180/ledsInRing[j-1]])
                 bumpy_loop(radiusOuter1, ledsInRing[j-1], ringAmplitude[j-1]);
             }  
             else {
@@ -69,8 +78,10 @@ else {difference(){
             }
              
         // radiating lines
-           if (j > 0){              radiusOuter2 = sum(ringRadius, j);
+           if (j > 0){              
+              radiusOuter2 = sum(ringRadius, j);
               radiusInner2 = sum(ringRadius, j-1);
+              rotate([0,0,180/ledsInRing[j]]) 
               for (k = [0:1:ledsInRing[j]/2 - 1]){
                   translate([0,0,0])
                   rotate([0,0,(k*360/ledsInRing[j]) - 360/ledsInRing[j]])
