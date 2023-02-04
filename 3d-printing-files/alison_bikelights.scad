@@ -1,6 +1,6 @@
 frameThickness=1;
 centreCircleDiameter=15;
-fn=8;
+fn=16;
 ledsInRing=[1, 8, 12, 16, 24, 32];
 ringRadius=[7.5, 10, 10, 10, 10, 27];
 ringAmplitude=[7, 7, 7, 7, 7, 17];
@@ -13,6 +13,7 @@ slope=0.9;
 boltDiameter=3;
 numBolts=8;
 brimDepth=1.5;
+boltInclude=[2,5,10,13,18,21,26,29];
 difference(){
     union(){
         rotate([0,0,180/ledsInRing[noRings - 1]])
@@ -25,13 +26,13 @@ difference(){
          } 
          linear_extrude(height = brimDepth, center = false, $fn = fn){
              difference(){
-             circle(r = sum(ringRadius, noRings-1) + frameThickness/2);
-                 // bolt holes
-                 for (k = [0:1:numBolts-1]){
-                     rotate([0,0,(k*360/numBolts) + 180/ledsInRing[noRings-1]])
-                     translate([sum(ringRadius, noRings-1) - 3*boltDiameter/2,0,0])
-                     circle(r=boltDiameter/2);
-                 }
+                 circle(r = sum(ringRadius, noRings-1) + frameThickness/2);
+    
+                 for (m = [0:1:numBolts - 1]){
+                      rotate([0,0,(boltInclude[m] * 360/ledsInRing[noRings-1]) + 180/ledsInRing[noRings-1]])
+                      translate([sum(ringRadius, noRings-1) - 3*boltDiameter/2,0,0])
+                      circle(r=boltDiameter/2);
+                  }
              }
          } 
      } 
