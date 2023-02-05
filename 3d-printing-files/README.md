@@ -1,1 +1,1 @@
-Work in progress - bikelights for Alison
+3d printed diffuser for LED disk (WIP)

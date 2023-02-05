@@ -1,13 +1,13 @@
 frameThickness=1;
 centreCircleDiameter=15;
-fn=16;
+fn=100;
 ledsInRing=[1, 8, 12, 16, 24, 32];
 ringRadius=[7.5, 10, 10, 10, 10, 27];
 ringAmplitude=[7, 7, 7, 7, 7, 17];
 noRings=6;
-height=12;
+height=14;
 diskRadius=115/2;
-diskIndent=3;
+diskIndent=5;
 plateRadius=100;
 slope=0.9;
 boltDiameter=3;
